@@ -17,6 +17,10 @@ services:
       - 8888:8000
     volumes:
       - ./:/app
+    links:
+      - registry
+    env_file:
+      - ./.env
 
 volumes:
   registry:
