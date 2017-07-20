@@ -1,0 +1,14 @@
+*~
+#*
+\#*
+.#*
+.dir-locals.el
+*.bkp
+.project
+*.swp
+*.orig
+*_BASE_*
+*_REMOTE_*
+*_LOCAL_*
+*.logs
+*.pyc

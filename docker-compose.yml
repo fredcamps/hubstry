@@ -1,0 +1,22 @@
+version: '3'
+services:
+  registry:
+    image: registry:2
+    container_name: registry
+    restart: always
+    ports:
+      - 5000:5000
+    volumes:
+      - registry:/var/lib/registry
+
+  hubstry:
+    build: .
+    container_name: hubstry
+    ports:
+      - 8880:8080
+      - 8888:8000
+    volumes:
+      - ./:/app
+
+volumes:
+  registry:
