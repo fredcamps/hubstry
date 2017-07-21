@@ -1,5 +1,6 @@
+
 from .settings import Conf
-from urllib import request
+import requests
 
 
 class Registry(object):
@@ -15,6 +16,9 @@ class Registry(object):
         else:
             last = '&last=' % last_image
         url = '%s/_catalog?n=%s%s' % (self.api_url, limit, last)
-        response = request.Request(url=url, headers=headers, method=method)
+
+        response = requests.get(url, auth=('admin', 'admin'))
+
         import ipdb;ipdb.set_trace()
+
         return response

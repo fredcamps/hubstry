@@ -6,6 +6,6 @@ WORKDIR /app
 
 RUN pip install -r requirements.txt
 
-EXPOSE 8080
+EXPOSE 9090
 
-CMD [ "./manage.py", "runserver", "--host", "0.0.0.0", "--port", "8080" ]
+CMD [ "./manage.py", "runserver", "--host", "0.0.0.0", "--port", "9090" ]

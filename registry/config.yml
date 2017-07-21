@@ -1,0 +1,12 @@
+version: 0.1
+log:
+  accesslog:
+    disabled: false
+  level: warn
+storage:
+  filesystem:
+    rootdirectory: /var/lib/directory
+    maxthreads: 100
+http:
+  addr: 0.0.0.0:5000
+  secret: 87f9dc2a4f42a118e5c55a746169bd15309bb57a

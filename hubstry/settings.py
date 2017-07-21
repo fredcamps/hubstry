@@ -6,5 +6,5 @@ class Conf(object):
         pass
 
     class Registry(object):
-        URL = 'http://%s' % os.environ.get('REGISTRY_URL')
+        URL = os.environ.get('REGISTRY_URL')
         API_VERSION = 'v2'

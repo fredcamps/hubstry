@@ -1,5 +1,20 @@
 version: '3'
 services:
+  proxy:
+    image: nginx:1.13.3-alpine
+    container_name: proxy
+    volumes:
+      - ./proxy/certs:/etc/nginx/certs
+      - ./proxy/sites:/etc/nginx/conf.d
+      - ./proxy/htpasswd:/etc/nginx/users/auth
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    links:
+      - registry
+      - hubstry
+
   registry:
     image: registry:2
     container_name: registry
@@ -8,19 +23,20 @@ services:
       - 5000:5000
     volumes:
       - registry:/var/lib/registry
+      - ./registry/config.yml:/etc/docker/registry/config.yml
 
   hubstry:
     build: .
     container_name: hubstry
     ports:
-      - 8880:8080
-      - 8888:8000
+      - 9090:9090
+      - 8888:8888
     volumes:
       - ./:/app
     links:
       - registry
-    env_file:
-      - ./.env
+    environment:
+      - REGISTRY_URL=http://registry:5000
 
 volumes:
   registry:
