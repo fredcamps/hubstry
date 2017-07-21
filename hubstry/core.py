@@ -1,6 +1,11 @@
 
 from .settings import Conf
+import json
 import requests
+
+
+class RegistryNotFound(BaseException):
+    pass
 
 
 class Registry(object):
@@ -9,16 +14,22 @@ class Registry(object):
         self.api_url = "%s/%s" % (Conf.Registry.URL, Conf.Registry.API_VERSION)
 
     def images(self, limit=20, last_image=None):
-        method = 'GET'
-        headers = {}
         if not last_image:
             last = ''
         else:
             last = '&last=' % last_image
         url = '%s/_catalog?n=%s%s' % (self.api_url, limit, last)
 
-        response = requests.get(url, auth=('admin', 'admin'))
+        response = requests.get(url)
+        content = json.loads(response.content.decode())
 
-        import ipdb;ipdb.set_trace()
+        if not content or not content.get('repositories'):
+            raise RegistryNotFound("No image(s) have been pushed!")
 
-        return response
+        return content.get('repositories')
+
+    def get_image_by_name(self, name):
+
+        url = '%s/%s' % (self.api_url, name)
+
+        response = requests.get(url)
