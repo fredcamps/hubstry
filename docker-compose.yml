@@ -10,13 +10,13 @@ services:
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
+      - 8080:8080 # REGISTRY
     links:
       - registry
       - hubstry
 
   registry:
-    image: registry:2
+    image: registry:2.6.2
     container_name: registry
     restart: always
     ports:
@@ -30,7 +30,7 @@ services:
     container_name: hubstry
     ports:
       - 9090:9090
-      - 8888:8888
+      - 8888:8888 # DEBUG
     volumes:
       - ./:/app
     links:
