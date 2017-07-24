@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 from flask_script import Manager
-from hubstry.app import create_app
+from hubstry.app import app
 
 
-app = create_app()
 manager = Manager(app)
 
 

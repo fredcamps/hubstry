@@ -37,6 +37,7 @@ services:
       - registry
     environment:
       - REGISTRY_URL=http://registry:5000
+      - HUBSTRY_DEBUG=1 # REMOVE THIS FOR LIVE ENVIRONMENT
 
 volumes:
   registry:
