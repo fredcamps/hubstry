@@ -62,7 +62,7 @@ class Registry(object):
     def find_image(self, name_to_find):
         images = self.images()
         r = re.compile(name_to_find)
-        result = filter(r.match, images)
+        result = filter(r.match, images.keys())
         return result
 
     def get_image_tags(self, name):
@@ -71,7 +71,6 @@ class Registry(object):
         content = Request.get(url=url,
                               index='tags',
                               error_msg=error_msg)
-
         return content
 
     def get_tag_manifests(self, name, tag):
@@ -82,7 +81,6 @@ class Registry(object):
         content = Request.get(url=url,
                               index='fsLayers',
                               error_msg=error_msg)
-
         return content
 
     def delete_tag(self, name, tag):
