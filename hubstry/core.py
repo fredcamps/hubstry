@@ -48,6 +48,14 @@ class Registry(object):
         Request.validate_response_status(response)
         return {'status': 200, 'message': 'Ok'}
 
+    def _all_images(self):
+        url = '%s/_catalog' % self.api_url
+        content = Request.get(url,
+                              index='repositories',
+                              error_msg='No image(s) found at catalog.')
+
+        return content
+
     def images(self, limit=20, last_image=None):
         if not last_image:
             last = ''
@@ -57,13 +65,19 @@ class Registry(object):
         content = Request.get(url=url,
                               index='repositories',
                               error_msg='No image(s) found at catalog.')
-        return content
+        return {
+            'images': content,
+            'last': content[-1],
+        }
 
-    def find_image(self, name_to_find):
-        images = self.images()
+    def find_image(self, name_to_find, limit=20):
+        images = self.all_images()
         r = re.compile(name_to_find)
-        result = filter(r.match, images.keys())
-        return result
+        filtereds = filter(r.match, images.keys())
+        return {
+            'last': None if len(filtereds) < limit else filtereds[limit-1],
+            'images': filtereds[0:limit-1],
+        }
 
     def get_image_tags(self, name):
         url = '%s/%s/tags/list' % (self.api_url, name)
