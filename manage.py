@@ -17,7 +17,7 @@ manager = Manager(app)
                 default=8000,
                 help='port number')
 def runserver(host, port):
-    app.run(host=host, port=port)
+    app.run(host=host, port=int(port))
 
 
 if __name__ == '__main__':
