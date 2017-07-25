@@ -17,7 +17,7 @@ class Request(object):
     @staticmethod
     def validate_response_status(response):
         if response.status_code != 200:
-            error_msg = "%Returned status code %d, Body %s" % \
+            error_msg = "Returned status code %d, Body %s" % \
                 (response.status_code, json.dumps(response.json()))
             raise RegistryUnexpectedResponse(error_msg)
 
@@ -26,7 +26,7 @@ class Request(object):
         response = requests.get(url)
         Request.validate_response_status(response)
         content = response.json()
-        if content.get(index):
+        if not content.get(index):
             raise RegistryNotFound(error_msg)
 
         return content.get(index)
@@ -44,7 +44,7 @@ class Registry(object):
 
     def healthcheck(self):
         url = '%s/' % self.api_url
-        response = requests.get(url)
+        response = requests.get(url=url)
         Request.validate_response_status(response)
         return {'status': 200, 'message': 'Ok'}
 
@@ -60,7 +60,7 @@ class Registry(object):
         if not last_image:
             last = ''
         else:
-            last = '&last=' % last_image
+            last = '&last=%s' % last_image
         url = '%s/_catalog?n=%s%s' % (self.api_url, limit, last)
         content = Request.get(url=url,
                               index='repositories',
@@ -70,13 +70,17 @@ class Registry(object):
             'last': content[-1],
         }
 
-    def find_image(self, name_to_find, limit=20):
-        images = self.all_images()
+    def find_image(self, name_to_find, limit=20, offset=0):
+        images = self._all_images()
         r = re.compile(name_to_find)
         filtereds = filter(r.match, images.keys())
+
+        if not filtereds:
+            raise RegistryNotFound("Image not found!")
+
         return {
-            'last': None if len(filtereds) < limit else filtereds[limit-1],
-            'images': filtereds[0:limit-1],
+            'last': None if len(filtereds) < limit else filtereds[-1],
+            'images': filtereds[offset:limit-1],
         }
 
     def get_image_tags(self, name):
