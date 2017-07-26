@@ -183,18 +183,28 @@ class TestRegistry(TestCase):
                           'python',
                           'latest')
 
+    @mock.patch('hubstry.core.requests.get')
+    def test_find_image_should_retrieve_results(self):
+        registry = Registry()
+        result = registry.find_image('yth')
+        self.assertEqual('python', result.get('images')[0])
+        result = registry.find_image('ython')
+        self.assertEqual('python', result.get('images')[0])
+        result = registry.find_image('pyth')
+        self.assertEqual('python', result.get('images')[0])
+        result = registry.find_image('python')
+        self.assertEqual('python', result.get('images')[0])
+
+
+    @pytest.mark.skip('not implemented yet')
+    def test_find_image_should_not_retrieve_results(self):
+        pass
+
+
     @pytest.mark.skip('not implemented yet')
     def test_delete_tag_should_succesful(self):
         pass
 
     @pytest.mark.skip('not implemented yet')
     def test_delete_tag_should_raise_exception_when_not_tag_layers(self):
-        pass
-
-    @pytest.mark.skip('not implemented yet')
-    def test_find_image_should_retrieve_results(self):
-        pass
-
-    @pytest.mark.skip('not implemented yet')
-    def test_find_image_should_not_retrieve_results(self):
         pass

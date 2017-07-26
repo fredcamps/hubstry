@@ -73,8 +73,8 @@ class Registry(object):
 
     def find_image(self, name_to_find, limit=20, offset=0):
         images = self._all_images()
-        r = re.compile(name_to_find)
-        filtereds = filter(r.match, images.keys())
+
+        filtereds = [image for image in images if name_to_find in image]
 
         if not filtereds:
             raise RegistryNotFound("Image not found!")
@@ -105,5 +105,9 @@ class Registry(object):
     def delete_tag(self, name, tag):
         url = '{0}/{1}/manifests/{2}'.format(self.api_url, name, tag)
 
-        self.get_tag_layers(name, tag)
+        Request.delete(url=url)
+
+    def delete_layer(self, name, digest):
+        url = '{0}/{1}/blobs/{1}'.format(self.api_url, name, digest)
+
         Request.delete(url=url)
