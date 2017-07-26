@@ -105,30 +105,90 @@ class TestRegistry(TestCase):
         registry = Registry()
         self.assertRaises(RegistryNotFound, registry.images)
 
+    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_get_image_tags_should_retrieve_result(self, m_request):
+        class Response(object):
+            status_code = 200
+
+            @staticmethod
+            def json():
+                return {'tags': ['latest']}
+
+        m_request.return_value = Response
         registry = Registry()
         tags = registry.get_image_tags('python')
-        import ipdb;ipdb.set_trace()
+        url = '{0}/{1}/tags/list'.format(registry.api_url, 'python')
+        m_request.assert_called_once_with(url)
+
+        self.assertEqual(['latest'], tags)
 
     @pytest.mark.skip('not implemented yet')
-    def test_get_image_tags_should_raise_exception(self):
-        pass
+    @mock.patch('hubstry.core.requests.get')
+    def test_get_image_tags_should_raise_registry_not_found(self, m_request):
+        class Response(object):
+            status_code = 200
+
+            @staticmethod
+            def json():
+                return {'tags': []}
+
+        m_request.return_value = Response
+        registry = Registry()
+
+        self.assertRaises(RegistryNotFound, registry.get_image_tags, 'myball')
 
     @pytest.mark.skip('not implemented yet')
-    def test_get_tag_manifests_should_retrieve_results(self):
-        pass
+    @mock.patch('hubstry.core.requests.get')
+    def test_get_tag_layers_should_retrieve_results(self, m_request):
+        class Response(object):
+            status_code = 200
+
+            @staticmethod
+            def json():
+                return {
+                    'fsLayers': [
+                        {'blobSum': 'sha256:a3ed95caeb02'},
+                    ]
+                }
+        m_request.return_value = Response
+
+        registry = Registry()
+        manifests = registry.get_tag_layers('python', 'latest')
+
+        self.assertEqual([{'blobSum': 'sha256:a3ed95caeb02'}], manifests)
+        m_request.assert_called_once_with(
+            '{0}/{1}/manifests/{2}'.format(registry.api_url,
+                                           'python',
+                                           'latest')
+        )
 
     @pytest.mark.skip('not implemented yet')
-    def test_get_tag_manifests_should_raise_exception(self):
-        pass
+    @mock.patch('hubstry.core.requests.get')
+    def test_get_tag_layers_should_raise_registry_not_found(self, m_request):
+        class Response(object):
+            status_code = 200
+
+            @staticmethod
+            def json():
+                return {
+                    'fsLayers': [
+                    ]
+                }
+        m_request.return_value = Response
+        registry = Registry()
+
+        self.assertRaises(RegistryNotFound,
+                          registry.get_tag_layers,
+                          'python',
+                          'latest')
 
     @pytest.mark.skip('not implemented yet')
     def test_delete_tag_should_succesful(self):
         pass
 
     @pytest.mark.skip('not implemented yet')
-    def test_delete_tag_should_raise_exception_when_not_found_manifest(self):
+    def test_delete_tag_should_raise_exception_when_not_tag_layers(self):
         pass
 
     @pytest.mark.skip('not implemented yet')

@@ -26,6 +26,7 @@ class Request(object):
         response = requests.get(url)
         Request.validate_response_status(response)
         content = response.json()
+
         if not content.get(index):
             raise RegistryNotFound(error_msg)
 
@@ -91,7 +92,7 @@ class Registry(object):
                               error_msg=error_msg)
         return content
 
-    def get_tag_manifests(self, name, tag):
+    def get_tag_layers(self, name, tag):
         url = '{0}/{1}/manifests/{2}'.format(self.api_url, name, tag)
 
         error_msg = \
@@ -104,5 +105,5 @@ class Registry(object):
     def delete_tag(self, name, tag):
         url = '{0}/{1}/manifests/{2}'.format(self.api_url, name, tag)
 
-        self.get_tag_manifests(name, tag)
+        self.get_tag_layers(name, tag)
         Request.delete(url=url)
