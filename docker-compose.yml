@@ -24,6 +24,8 @@ services:
     volumes:
       - registry:/var/lib/registry
       - ./registry/config.yml:/etc/docker/registry/config.yml
+    environment:
+      - REGISTRY_STORAGE_DELETE_ENABLED=true
 
   hubstry:
     build: .
