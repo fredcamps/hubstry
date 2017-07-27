@@ -20,10 +20,14 @@ class TestRegistry(TestCase):
         class Response(object):
             status_code = 200
 
+            @staticmethod
+            def json():
+                return {}
+
         mocked_request.return_value = Response
         registry = Registry()
         result = registry.healthcheck()
-        mocked_request.assert_called_once_with(url='%s/' % registry.api_url)
+        mocked_request.assert_called_once_with('%s/' % registry.api_url)
         self.assertEqual(result.get('status'), 200)
         self.assertEqual(result.get('message'), 'Ok')
         mocked_request.reset_mock()
@@ -162,8 +166,7 @@ class TestRegistry(TestCase):
             @staticmethod
             def json():
                 return {
-                    'fsLayers': [
-                    ]
+                    'fsLayers': []
                 }
         m_request.return_value = Response
         registry = Registry()
@@ -185,6 +188,7 @@ class TestRegistry(TestCase):
         m_request.return_value = Response
         registry = Registry()
         result = registry.find_image('yth')
+        m_request.assert_called_with('%s/_catalog' % registry.api_url)
         self.assertEqual(2, len(result))
         self.assertEqual('python', result.get('images')[0])
         result = registry.find_image('ython')
@@ -211,6 +215,10 @@ class TestRegistry(TestCase):
     def test_delete_tag_should_successful(self, m_request):
         class Response(object):
             status_code = 200
+
+            @staticmethod
+            def json():
+                return {}
 
         m_request.return_value = Response
         registry = Registry()
@@ -241,6 +249,10 @@ class TestRegistry(TestCase):
     def test_delete_layer_should_successful(self, m_request):
         class Response(object):
             status_code = 200
+
+            @staticmethod
+            def json():
+                return {}
 
         m_request.return_value = Response
         registry = Registry()
