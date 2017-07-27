@@ -2,7 +2,6 @@ from unittest import (
     mock,
     TestCase,
 )
-import pytest
 
 from hubstry.core import (
     Registry,
@@ -16,7 +15,6 @@ class TestRegistry(TestCase):
     def setUp(self):
         super().setUp()
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_healthcheck_should_return_ok(self, mocked_request):
         class Response(object):
@@ -30,7 +28,6 @@ class TestRegistry(TestCase):
         self.assertEqual(result.get('message'), 'Ok')
         mocked_request.reset_mock()
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_healthcheck_should_raises_unexpected_response(self, mock_request):
         class Response(object):
@@ -46,7 +43,6 @@ class TestRegistry(TestCase):
         registry = Registry()
         self.assertRaises(RegistryUnexpectedResponse, registry.healthcheck)
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_images_without_last_param_should_retrieve_result(self, m_request):
         class Response(object):
@@ -67,7 +63,6 @@ class TestRegistry(TestCase):
         )
         self.assertEqual(expected, images)
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_images_with_last_param_should_retrieve_result(self, m_request):
 
@@ -89,7 +84,6 @@ class TestRegistry(TestCase):
         )
         self.assertEqual(expected, images)
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_images_should_raise_registry_not_found(self, m_request):
 
@@ -105,7 +99,6 @@ class TestRegistry(TestCase):
         registry = Registry()
         self.assertRaises(RegistryNotFound, registry.images)
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_get_image_tags_should_retrieve_result(self, m_request):
         class Response(object):
@@ -123,7 +116,6 @@ class TestRegistry(TestCase):
 
         self.assertEqual(['latest'], tags)
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_get_image_tags_should_raise_registry_not_found(self, m_request):
         class Response(object):
@@ -138,7 +130,6 @@ class TestRegistry(TestCase):
 
         self.assertRaises(RegistryNotFound, registry.get_image_tags, 'myball')
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_get_tag_layers_should_retrieve_results(self, m_request):
         class Response(object):
@@ -163,7 +154,6 @@ class TestRegistry(TestCase):
                                            'latest')
         )
 
-    @pytest.mark.skip('not implemented yet')
     @mock.patch('hubstry.core.requests.get')
     def test_get_tag_layers_should_raise_registry_not_found(self, m_request):
         class Response(object):
@@ -184,9 +174,18 @@ class TestRegistry(TestCase):
                           'latest')
 
     @mock.patch('hubstry.core.requests.get')
-    def test_find_image_should_retrieve_results(self):
+    def test_find_image_should_retrieve_results(self, m_request):
+        class Response(object):
+            status_code = 200
+
+            @staticmethod
+            def json():
+                return {'repositories': ['python', 'python3']}
+
+        m_request.return_value = Response
         registry = Registry()
         result = registry.find_image('yth')
+        self.assertEqual(2, len(result))
         self.assertEqual('python', result.get('images')[0])
         result = registry.find_image('ython')
         self.assertEqual('python', result.get('images')[0])
@@ -195,16 +194,71 @@ class TestRegistry(TestCase):
         result = registry.find_image('python')
         self.assertEqual('python', result.get('images')[0])
 
+    @mock.patch('hubstry.core.requests.get')
+    def test_find_image_should_raise_registry_not_found(self, m_request):
+        class Response(object):
+            status_code = 200
 
-    @pytest.mark.skip('not implemented yet')
-    def test_find_image_should_not_retrieve_results(self):
-        pass
+            @staticmethod
+            def json():
+                return {'repositories': ['nginx']}
 
+        m_request.return_value = Response
+        registry = Registry()
+        self.assertRaises(RegistryNotFound, registry.find_image, 'python')
 
-    @pytest.mark.skip('not implemented yet')
-    def test_delete_tag_should_succesful(self):
-        pass
+    @mock.patch('hubstry.core.requests.delete')
+    def test_delete_tag_should_successful(self, m_request):
+        class Response(object):
+            status_code = 200
 
-    @pytest.mark.skip('not implemented yet')
-    def test_delete_tag_should_raise_exception_when_not_tag_layers(self):
-        pass
+        m_request.return_value = Response
+        registry = Registry()
+        registry.delete_tag('python', 'latest')
+        m_request.assert_called_once_with(
+            '%s/python/manifests/latest' % registry.api_url
+        )
+
+    @mock.patch('hubstry.core.requests.delete')
+    def test_delete_tag_should_raise_unexpected_response(self, m_request):
+        class Response(object):
+            status_code = 502
+
+            @staticmethod
+            def json():
+                return {
+                    'msg': 'You\'re fucked!'
+                }
+
+        m_request.return_value = Response
+        registry = Registry()
+        self.assertRaises(RegistryUnexpectedResponse,
+                          registry.delete_tag,
+                          'mysql',
+                          'latest')
+
+    @mock.patch('hubstry.core.requests.delete')
+    def test_delete_layer_should_successful(self, m_request):
+        class Response(object):
+            status_code = 200
+
+        m_request.return_value = Response
+        registry = Registry()
+        registry.delete_layer('python', 'sha256:a3ed95caeb02')
+        m_request.assert_called_once_with(
+            '%s/python/blobs/sha256:a3ed95caeb02' % registry.api_url
+        )
+
+    @mock.patch('hubstry.core.requests.delete')
+    def test_delete_layer_should_raise_unexpected_response(self, m_request):
+        class Response(object):
+            status_code = 401
+
+            @staticmethod
+            def json():
+                return {}
+
+        m_request.return_value = Response
+        registry = Registry()
+        self.assertRaises(RegistryUnexpectedResponse,
+                          registry.delete_layer, 'python', 'blablabla')

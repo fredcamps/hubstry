@@ -1,5 +1,4 @@
 import json
-import re
 import requests
 from .settings import Conf
 
@@ -108,6 +107,6 @@ class Registry(object):
         Request.delete(url=url)
 
     def delete_layer(self, name, digest):
-        url = '{0}/{1}/blobs/{1}'.format(self.api_url, name, digest)
+        url = '{0}/{1}/blobs/{2}'.format(self.api_url, name, digest)
 
         Request.delete(url=url)
