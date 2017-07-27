@@ -30,6 +30,7 @@ services:
   hubstry:
     build: .
     container_name: hubstry
+    restart: always
     ports:
       - 9090:9090
       - 8888:8888 # DEBUG
