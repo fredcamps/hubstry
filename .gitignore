@@ -13,3 +13,5 @@
 *.logs
 *.pyc
 *.cache
+htmlcov
+.coverage
