@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify, render_template
 from .settings import Conf
 
 
@@ -14,3 +14,13 @@ def create_app():
 
 
 app = create_app()
+
+
+@app.route('/healthcheck')
+def healthcheck():
+    return jsonify({'status': 200, 'message': 'is alive'})
+
+
+@app.route('/')
+def home():
+    return render_template('home.jinja2', data={})
