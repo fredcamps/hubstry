@@ -17,9 +17,19 @@
 
 {% block body %}
   <div class="body">
-    <div class="jumbotron text-center">
+    <div class="jumbotron text-center" style="padding: 10px 0 0 0">
       <h3>Hubstry - Docker Registry Front-End</h3>
+      <div class="container">
+	<br>
+      </div>
       {% block top %}
+	<form class="form-inline">
+	  <div class="form-group">
+	    <label for="search">Find Image</label>
+	    <input class="form-control" type="text" placeholder="Put image name for search" id="search" name="search"/>
+	  </div>
+	  <button class="btn btn-primary">Search</button>
+	</form>
       {% endblock top %}
     </div>
     <div class="container">
@@ -28,7 +38,11 @@
       {% endblock content %}
     </div>
     {% block footer %}
-      <nav class="navbar navbar-default navbar-fixed-bottom">
+      <nav class="navbar navbar-default navbar-fixed-bottom text-center">
+	<ul>
+	  <li>About</li>
+	  <li>Back to the top</li>
+	</ul>
       </nav>
     {% endblock footer %}
   </div>
